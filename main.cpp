@@ -10,9 +10,6 @@ using namespace std;
 
 void menu(vector<Card> &cards, int &amountofcards);
 void addcard(vector<Card> &cards, int &amountofcards);
-/*
-    Sprawdza czy plik jest pusty
-*/
 
 /*
     Funkcja wczytuje dane z pliku
@@ -31,32 +28,36 @@ void loaddata(vector<Card> &cards, int &amountofcards)
             data.push_back(line);
         }
 
-        if (savedata.tellg() == 0)
+        if (savedata.peek() == ifstream::traits_type::eof())
         {
-            for (int x = 0; x <= (data.size()) % 6; x++)
+            for (int x = 0; x < data.size() / 6; x++)
             {
                 addcard(cards, amountofcards);
-                for (int i = 0; i <= data.size(); i += 7)
-                {
-                    cards[x].name = data[i];
-                    cards[x].surname = data[i + 1];
-                    cards[x].PIN = atoi(data[i + 2].c_str());
-                    cards[x].card_number = atoll(data[i + 3].c_str());
-                    cards[x].card_type = data[i + 4];
-                    cards[x].money = atof(data[i + 5].c_str());
-                    cout << cards[x].name << endl;
-                    cout << cards[x].surname << endl;
-                    cout << cards[x].PIN << endl;
-                    cout << cards[x].card_number << endl;
-                    cout << cards[x].card_type << endl;
-                    cout << cards[x].money << endl;
-                }
+            }
+            int x = 0;
+            for (int i = 0; i < data.size() - 1; i += 6)
+            {
+                cards[x].name = data[i];
+                cards[x].surname = data[i + 1];
+                cards[x].PIN = atoi(data[i + 2].c_str());
+                cards[x].card_number = atoll(data[i + 3].c_str());
+                cards[x].card_type = data[i + 4];
+                cards[x].money = atof(data[i + 5].c_str());
+                cout << cards[x].name << endl;
+                cout << cards[x].surname << endl;
+                cout << cards[x].PIN << endl;
+                cout << cards[x].card_number << endl;
+                cout << cards[x].card_type << endl;
+                cout << cards[x].money << endl;
+                x++;
             }
         }
     }
     savedata.close();
 }
-
+/*
+* funkcja zapisuje dane do pliku
+*/
 void savedata(int amountofcards, vector<Card> cards)
 {
     ofstream savedata("data.txt");
@@ -72,6 +73,9 @@ void savedata(int amountofcards, vector<Card> cards)
     savedata.close();
 }
 
+/*
+    Funkcja wyświetla dane karty oraz umozliwia operacje typu wypłacanie i wpłacanie pieniędzy
+*/
 void registeredcardmenu(int cardindex, vector<Card> &cards, int &amountofcards)
 {
     cout << "Wprowadz PIN do karty: ";

@@ -23,10 +23,13 @@ public:
         card_number = rand() % (9999999999999999 - 1000000000000000 + 1) + 1000000000000000;
     }
 
+    /*
+        Losuje typ karty
+    */
     void generate_card_type()
     {
         string acceptedcards[4] = {"VISA", "American Express", "Visa Electron", "Mastercard"};
-        card_type = acceptedcards[rand() % 4 + 1];
+        card_type = acceptedcards[rand() % 4];
     }
 
     /*
@@ -44,7 +47,7 @@ public:
     }
 
     /*
-    Funkcja wyświetla podstawowe dane klasy Card
+        Funkcja wyświetla podstawowe dane klasy Card
     */
     void cardinfo()
     {
