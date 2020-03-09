@@ -1,108 +1,262 @@
 #include <iostream>
-#include "zbior.h"
+#include "classes.h"
 #include <vector>
-#include <windows.h>
+#include <fstream>
+#include <time.h>
 #include <string>
-#include <cstring>
+#include <cstdlib>
 
 using namespace std;
 
-void switchtosmall(string &napis);
-    karta karty;
-    karta::Cards k1;
-    vector<karta::Cards> card;
-    void menu();
-    HANDLE hout;
-    extern vector<string> wlasc;
-    bool sprawdz(const vector<string> &wlasciciel, const string &uzytkownik);
-    void SetCP()
+void menu(vector<Card> &cards, int &amountofcards);
+void addcard(vector<Card> &cards, int &amountofcards);
+/*
+    Sprawdza czy plik jest pusty
+*/
+
+/*
+    Funkcja wczytuje dane z pliku
+*/
+void loaddata(vector<Card> &cards, int &amountofcards)
 {
-    SetConsoleCP(1250);
-    SetConsoleOutputCP(1250);
-    setlocale(LC_ALL, "1250");
+    vector<string> data;
+    ifstream savedata;
+    savedata.open("data.txt", ios::in);
+    string line;
+    if (savedata.good() == true)
+    {
+        while (!savedata.eof())
+        {
+            getline(savedata, line);
+            data.push_back(line);
+        }
+
+        if (savedata.tellg() == 0)
+        {
+            for (int x = 0; x <= (data.size()) % 6; x++)
+            {
+                addcard(cards, amountofcards);
+                for (int i = 0; i <= data.size(); i += 7)
+                {
+                    cards[x].name = data[i];
+                    cards[x].surname = data[i + 1];
+                    cards[x].PIN = atoi(data[i + 2].c_str());
+                    cards[x].card_number = atoll(data[i + 3].c_str());
+                    cards[x].card_type = data[i + 4];
+                    cards[x].money = atof(data[i + 5].c_str());
+                    cout << cards[x].name << endl;
+                    cout << cards[x].surname << endl;
+                    cout << cards[x].PIN << endl;
+                    cout << cards[x].card_number << endl;
+                    cout << cards[x].card_type << endl;
+                    cout << cards[x].money << endl;
+                }
+            }
+        }
+    }
+    savedata.close();
+}
+
+void savedata(int amountofcards, vector<Card> cards)
+{
+    ofstream savedata("data.txt");
+    for (int i = 0; i < amountofcards; i++)
+    {
+        savedata << cards[i].name << endl;
+        savedata << cards[i].surname << endl;
+        savedata << cards[i].PIN << endl;
+        savedata << cards[i].card_number << endl;
+        savedata << cards[i].card_type << endl;
+        savedata << cards[i].money << endl;
+    }
+    savedata.close();
+}
+
+void registeredcardmenu(int cardindex, vector<Card> &cards, int &amountofcards)
+{
+    cout << "Wprowadz PIN do karty: ";
+    if (cards[cardindex].pincheck())
+    {
+
+        for (;;)
+        {
+            system("clear");
+            cout << "Ilość środkow: " << cards[cardindex].money << endl;
+            cout << "-----------------" << endl;
+            cout << "1.Informacje o karcie" << endl;
+            cout << "2.Wypłać pieniądze" << endl;
+            cout << "3.Wpłać pieniądze" << endl;
+            cout << "4.Zmień PIN do karty" << endl;
+            cout << "0.Powrot do menu głownego" << endl;
+            cout << "-----------------" << endl;
+            int chose_option;
+            cin >> chose_option;
+            switch (chose_option)
+            {
+            case 1:
+                cards[cardindex].cardinfo();
+                break;
+            case 2:
+                cards[cardindex].change_money(0);
+                break;
+            case 3:
+                cards[cardindex].change_money(1);
+                break;
+            case 4:
+                cards[cardindex].change_pin();
+                break;
+            case 0:
+                menu(cards, amountofcards);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    else
+    {
+        for (;;)
+        {
+            system("clear");
+            cout << "-------------------------------------" << endl;
+            cout << "Został wprowadzony zły kod pin." << endl;
+            cout << "Proszę sprobować ponownie." << endl;
+            cout << "-------------------------------------" << endl;
+            cout << "Kliknij 0 aby kontynuować." << endl;
+            char enter = 1;
+            system("/bin/stty raw");
+            enter = getchar();
+            system("/bin/stty cooked");
+            if (enter == '0')
+            {
+                break;
+            }
+        }
+    }
+}
+
+/*
+    Zamienia wszystkie literki w stringu na małe
+*/
+string tolowerletters(string str)
+{
+    for (int i = 0; i < str.size(); i++)
+    {
+        str[i] = tolower(str[i]);
+    }
+    return str;
+}
+
+/*
+    Sprawdza czy karta juz istnieje oraz podaj numer indexu instniejącej karty.
+*/
+bool checkcard(vector<Card> &cards, int &cardindex)
+{
+    string name;
+    string surname;
+    cout << "Podaj imię: ";
+    cin >> name;
+    cout << "Podaj nazwisko: ";
+    cin >> surname;
+    for (int i = 0; i < cards.size(); i++)
+    {
+        if (tolowerletters(name) == tolowerletters(cards[i].name) && tolowerletters(surname) == tolowerletters(cards[i].surname))
+        {
+            cardindex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+/*
+    Pozwala na konfigurację stworzonej karty
+*/
+void dataofcard(vector<Card> &cards, int amountofcards)
+{
+    cout << "Podaj imię: ";
+    cin >> cards[amountofcards - 1].name;
+    cout << "Podaj nazwisko: ";
+    cin >> cards[amountofcards - 1].surname;
+    cout << "Podaj PIN do twojej karty: ";
+    cin >> cards[amountofcards - 1].PIN;
+    cards[amountofcards - 1].generate_card_number();
+    cards[amountofcards - 1].generate_card_type();
+}
+
+/*
+    Tworzy i dodaje nową kartę do wektora
+*/
+void addcard(vector<Card> &cards, int &amountofcards)
+{
+
+    Card card0;
+
+    cards.push_back(card0);
+    amountofcards++;
+}
+void menu(vector<Card> &cards, int &amountofcards)
+{
+    for (;;)
+    {
+        system("clear");
+        data d1; // klasa data
+        d1.dataobe();
+        cout << "Ilość kart: " << amountofcards << endl;
+        cout << "-----------------" << endl;
+        cout << "1.Wczytaj kartę" << endl;
+        cout << "2.Dodaj kartę" << endl;
+        cout << "0.Wyjście" << endl;
+        cout << "-----------------" << endl;
+        int chose_option; //pod wybor menu
+        cin >> chose_option;
+        bool dalej;
+        switch (chose_option)
+        {
+        case 1:
+            int cardindex;
+            if (checkcard(cards, cardindex))
+            {
+                registeredcardmenu(cardindex, cards, amountofcards);
+            }
+            else
+            {
+                for (;;)
+                {
+                    system("clear");
+                    cout << "-------------------------------------" << endl;
+                    cout << "Twoja karta nie jest zarejestrowana." << endl;
+                    cout << "Proszę ją dodać do systemu." << endl;
+                    cout << "-------------------------------------" << endl;
+                    cout << "Kliknij 0 aby kontynuować." << endl;
+                    char enter = 1;
+                    system("/bin/stty raw");
+                    enter = getchar();
+                    system("/bin/stty cooked");
+                    if (enter == '0')
+                    {
+                        break;
+                    }
+                }
+            }
+            break;
+        case 2:
+            addcard(cards, amountofcards);
+            dataofcard(cards, amountofcards);
+            break;
+        case 0:
+            savedata(amountofcards, cards);
+            exit(0);
+        default:
+            break;
+        }
+    }
 }
 
 int main()
 {
-    SetCP();
-    hout = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    karty.wczytaj_karty();
-
-    menu();
-
-}
-
-void menu()
-{
-string imie, nazwisko, imna; // imna = imie + nazwisko
-
-for(;;)
-{
-
-system("cls");
-SetConsoleTextAttribute(hout, FOREGROUND_RED);//zmiana koloru na czerwony
-data d1; // klasa data
-d1.dataobe();
-SetConsoleTextAttribute(hout, 15);//powrot do bialego
-SetConsoleTextAttribute(hout, FOREGROUND_BLUE);
-cout << "1.Wczytaj kart�\n2.Dodaj kart�\n0.Wyj�cie\n";
-SetConsoleTextAttribute(hout, 15);
-int m; //pod wybor menu
-do{
-cin.clear();
-cin.sync();
-cin >> m;
-}while(!cin);
-bool dalej;
-switch(m)
-{
-case 1:
-    karty.zmiana();
-    cout << "Podaj swoje imi�: ";
-    cin >> imie;
-    system("cls");
-    cout << "Podaj swoje nazwisko: ";
-    cin >> nazwisko;
-    system("cls");
-    imna = imie + nazwisko;
-    switchtosmall(imna);
-dalej = sprawdz(wlasc, imna);
-    if(dalej)
-    {
-        cout << "Jestes";
-    }
-
-
-    getchar();
-    getchar();
-    break;
-case 2:
-    break;
-case 0:
-    exit(0);
-default:
-    break;
-}
-}
-}
-
-void switchtosmall(string &napis){
-    for(int i =0;i < napis.length();i++){
-        napis[i] = tolower(napis[i]);
-    }
-
-}
-
-bool sprawdz(const vector<string> &wlasciciel, const string &uzytkownik)
-{
-    for(unsigned int i = 0; i < wlasciciel.size(); i++)
-    {
-        if(uzytkownik == wlasciciel[i])
-        {
-            return true;
-        }
-
-    }
-    return false;
+    int amountofcards = 0;
+    vector<Card> cards;
+    loaddata(cards, amountofcards);
+    menu(cards, amountofcards);
 }
