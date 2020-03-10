@@ -7,13 +7,130 @@
 #include <cstdlib>
 
 using namespace std;
-
-void menu(vector<Card> &cards, int &amountofcards);
+void load_card_types(vector<string> &card_types);
+void menu(vector<Card> &cards, int &amountofcards, vector<string> &card_types);
 void addcard(vector<Card> &cards, int &amountofcards);
+void print_card_types(vector<string> card_types);
+int main();
 
-/*
-    Funkcja wczytuje dane z pliku
-*/
+void add_card_types(vector<Card> &cards, int &amountofcards, vector<string> &card_types)
+{
+    ofstream cardtypes("types.txt");
+    for (;;)
+    {
+        string card_type;
+        system("clear");
+        cout << "------------------------------------------------" << endl;
+        cout << "Program jest uruchomiony poraz pierwszy." << endl;
+        cout << "Czy chcesz dodać nowe obsługiwane rodzaje kart?." << endl;
+        cout << "\n2.Wyświetl aktualnie obsługiwane rodzaje kart" << endl;
+        cout << "1.Tak" << endl;
+        cout << "0.Nie" << endl;
+        cout << "------------------------------------------------" << endl;
+        int menu_option;
+        cin >> menu_option;
+        switch (menu_option)
+        {
+        case 1:
+
+            cout << "Podaj nazwę rodzaju ktory chcesz dodać: ";
+            cin >> card_type;
+            cardtypes << card_type << endl;
+            cardtypes.close();
+            load_card_types(card_types);
+            break;
+        case 2:
+            print_card_types(card_types);
+            break;
+        case 0:
+            main();
+
+        default:
+            break;
+        }
+    }
+}
+
+/**
+ *  Funkcja po uruchominiu zapisuje do pliku tekst by moc sprawdzic 
+ *  czy program był juz uruchamiany
+ */
+void firstrun()
+{
+    ofstream checkifused("wasrun.txt");
+    checkifused << "true";
+    checkifused.close();
+}
+
+/**
+ *  Sprawdza czy program był juz uruchomiony
+ */
+bool wasused()
+{
+    ifstream checkifused("wasrun.txt");
+    string line;
+    if (checkifused.good() == true)
+    {
+        while (!checkifused.eof())
+        {
+            getline(checkifused, line);
+            if (line == "true")
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+/**
+ *  Funkcja dodaje rodzaje kart z pliku txt
+ */
+void load_card_types(vector<string> &card_types)
+{
+    ifstream cardtypes;
+    cardtypes.open("types.txt", ios::in);
+    string line;
+    if (cardtypes.good() == true)
+    {
+        while (!cardtypes.eof())
+        {
+            getline(cardtypes, line);
+            card_types.push_back(line);
+        }
+    }
+    cardtypes.close();
+}
+/**
+ *  Printuje obsługiwane rodzaje kart
+ */
+void print_card_types(vector<string> card_types)
+{
+    for (;;)
+    {
+        system("clear");
+        cout << "-------------------------------------" << endl;
+        cout << "Obsługiwane rodzaje kart: " << endl;
+        cout << "\n|";
+        for (int i = 0; i < card_types.size(); i++)
+        {
+            cout << " " << card_types[i] << " |";
+        }
+        cout << "\n\n-------------------------------------" << endl;
+        cout << "Kliknij 0 aby kontynuować." << endl;
+        char enter = 1;
+        system("/bin/stty raw");
+        enter = getchar();
+        system("/bin/stty cooked");
+        if (enter == '0')
+        {
+            break;
+        }
+    }
+}
+
+/**
+ *    Funkcja wczytuje dane z pliku
+ */
 void loaddata(vector<Card> &cards, int &amountofcards)
 {
     vector<string> data;
@@ -56,8 +173,8 @@ void loaddata(vector<Card> &cards, int &amountofcards)
     savedata.close();
 }
 /*
-* funkcja zapisuje dane do pliku
-*/
+ * funkcja zapisuje dane do pliku
+ */
 void savedata(int amountofcards, vector<Card> cards)
 {
     ofstream savedata("data.txt");
@@ -74,9 +191,9 @@ void savedata(int amountofcards, vector<Card> cards)
 }
 
 /*
-    Funkcja wyświetla dane karty oraz umozliwia operacje typu wypłacanie i wpłacanie pieniędzy
-*/
-void registeredcardmenu(int cardindex, vector<Card> &cards, int &amountofcards)
+ *    Funkcja wyświetla dane karty oraz umozliwia operacje typu wypłacanie i wpłacanie pieniędzy
+ */
+void registeredcardmenu(int cardindex, vector<Card> &cards, int &amountofcards, vector<string> &card_types)
 {
     cout << "Wprowadz PIN do karty: ";
     if (cards[cardindex].pincheck())
@@ -110,7 +227,7 @@ void registeredcardmenu(int cardindex, vector<Card> &cards, int &amountofcards)
                 cards[cardindex].change_pin();
                 break;
             case 0:
-                menu(cards, amountofcards);
+                menu(cards, amountofcards, card_types);
                 break;
             default:
                 break;
@@ -140,8 +257,8 @@ void registeredcardmenu(int cardindex, vector<Card> &cards, int &amountofcards)
 }
 
 /*
-    Zamienia wszystkie literki w stringu na małe
-*/
+ *   Zamienia wszystkie literki w stringu na małe
+ */
 string tolowerletters(string str)
 {
     for (int i = 0; i < str.size(); i++)
@@ -152,8 +269,8 @@ string tolowerletters(string str)
 }
 
 /*
-    Sprawdza czy karta juz istnieje oraz podaj numer indexu instniejącej karty.
-*/
+ *   Sprawdza czy karta juz istnieje oraz podaj numer indexu instniejącej karty.
+ */
 bool checkcard(vector<Card> &cards, int &cardindex)
 {
     string name;
@@ -174,9 +291,9 @@ bool checkcard(vector<Card> &cards, int &cardindex)
 }
 
 /*
-    Pozwala na konfigurację stworzonej karty
-*/
-void dataofcard(vector<Card> &cards, int amountofcards)
+ *   Pozwala na konfigurację stworzonej karty
+ */
+void dataofcard(vector<Card> &cards, int amountofcards, vector<string> &card_types)
 {
     cout << "Podaj imię: ";
     cin >> cards[amountofcards - 1].name;
@@ -185,12 +302,12 @@ void dataofcard(vector<Card> &cards, int amountofcards)
     cout << "Podaj PIN do twojej karty: ";
     cin >> cards[amountofcards - 1].PIN;
     cards[amountofcards - 1].generate_card_number();
-    cards[amountofcards - 1].generate_card_type();
+    cards[amountofcards - 1].generate_card_type(card_types);
 }
 
 /*
-    Tworzy i dodaje nową kartę do wektora
-*/
+ *   Tworzy i dodaje nową kartę do wektora
+ */
 void addcard(vector<Card> &cards, int &amountofcards)
 {
 
@@ -199,7 +316,7 @@ void addcard(vector<Card> &cards, int &amountofcards)
     cards.push_back(card0);
     amountofcards++;
 }
-void menu(vector<Card> &cards, int &amountofcards)
+void menu(vector<Card> &cards, int &amountofcards, vector<string> &card_types)
 {
     for (;;)
     {
@@ -207,11 +324,12 @@ void menu(vector<Card> &cards, int &amountofcards)
         data d1; // klasa data
         d1.dataobe();
         cout << "Ilość kart: " << amountofcards << endl;
-        cout << "-----------------" << endl;
+        cout << "---------------------------" << endl;
         cout << "1.Wczytaj kartę" << endl;
         cout << "2.Dodaj kartę" << endl;
+        cout << "3.Obsługiwane rodzaje kart" << endl;
         cout << "0.Wyjście" << endl;
-        cout << "-----------------" << endl;
+        cout << "---------------------------" << endl;
         int chose_option; //pod wybor menu
         cin >> chose_option;
         bool dalej;
@@ -221,7 +339,7 @@ void menu(vector<Card> &cards, int &amountofcards)
             int cardindex;
             if (checkcard(cards, cardindex))
             {
-                registeredcardmenu(cardindex, cards, amountofcards);
+                registeredcardmenu(cardindex, cards, amountofcards, card_types);
             }
             else
             {
@@ -246,7 +364,10 @@ void menu(vector<Card> &cards, int &amountofcards)
             break;
         case 2:
             addcard(cards, amountofcards);
-            dataofcard(cards, amountofcards);
+            dataofcard(cards, amountofcards, card_types);
+            break;
+        case 3:
+            print_card_types(card_types);
             break;
         case 0:
             savedata(amountofcards, cards);
@@ -259,8 +380,24 @@ void menu(vector<Card> &cards, int &amountofcards)
 
 int main()
 {
+    vector<string> card_types;
+    card_types.clear();
+    card_types.push_back("VISA");
+    card_types.push_back("American Express");
+    card_types.push_back("Visa Electron");
+    card_types.push_back("Mastercard");
     int amountofcards = 0;
     vector<Card> cards;
+    if (wasused())
+    {
+    }
+    else
+    {
+        firstrun();
+        add_card_types(cards, amountofcards, card_types);
+    }
+    load_card_types(card_types);
+
     loaddata(cards, amountofcards);
-    menu(cards, amountofcards);
+    menu(cards, amountofcards, card_types);
 }

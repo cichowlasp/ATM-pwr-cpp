@@ -14,27 +14,26 @@ public:
     string card_type;
     double money = 0.0;
 
-    /*
-        Losuje numer karty
-    */
+    /**
+     *   Losuje numer karty
+     */
     void generate_card_number()
     {
         srand(time(0));
         card_number = rand() % (9999999999999999 - 1000000000000000 + 1) + 1000000000000000;
     }
 
-    /*
-        Losuje typ karty
-    */
-    void generate_card_type()
+    /**
+     *  Losuje typ karty
+     */
+    void generate_card_type(vector<string> &acceptedcards)
     {
-        string acceptedcards[4] = {"VISA", "American Express", "Visa Electron", "Mastercard"};
-        card_type = acceptedcards[rand() % 4];
+        card_type = acceptedcards[rand() % acceptedcards.size()];
     }
 
-    /*
-    Sprawdza pin czy wpisany pin zgadza się z pinem karty
-*/
+    /**
+     *  Sprawdza pin czy wpisany pin zgadza się z pinem karty
+     */
     bool pincheck()
     {
         int pin;
@@ -46,9 +45,9 @@ public:
         return false;
     }
 
-    /*
-        Funkcja wyświetla podstawowe dane klasy Card
-    */
+    /**
+     *  Funkcja wyświetla podstawowe dane klasy Card
+     */
     void cardinfo()
     {
         for (;;)
@@ -72,9 +71,9 @@ public:
         }
     }
 
-    /*
-        Funckja dodaje lub odejmuje pieniądze z konta
-    */
+    /**
+     *  Funckja dodaje lub odejmuje pieniądze z konta
+     */
     void change_money(int option)
     {
         double change;
@@ -114,7 +113,9 @@ public:
             }
         }
     }
-
+    /**
+     *  Funkcja pozwala na zmianę pinu po weryfikacji starego 
+     */
     void change_pin()
     {
         cout << "Wprowadz stary PIN do karty: ";
