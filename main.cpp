@@ -13,23 +13,29 @@ void addcard(vector<Card> &cards, int &amountofcards);
 void print_card_types(vector<string> card_types);
 int main();
 
+int displayMenu()
+{
+    int choice;
+    system("clear");
+    cout << "------------------------------------------------" << endl;
+    cout << "Program jest uruchomiony poraz pierwszy." << endl;
+    cout << "Czy chcesz dodać nowe obsługiwane rodzaje kart?." << endl;
+    cout << "\n2.Wyświetl aktualnie obsługiwane rodzaje kart" << endl;
+    cout << "1.Tak" << endl;
+    cout << "0.Nie" << endl;
+    cout << "------------------------------------------------" << endl;
+
+    cin >> choice;
+    return choice;
+}
+
 void add_card_types(vector<Card> &cards, int &amountofcards, vector<string> &card_types)
 {
     ofstream cardtypes("types.txt");
     for (;;)
     {
         string card_type;
-        system("clear");
-        cout << "------------------------------------------------" << endl;
-        cout << "Program jest uruchomiony poraz pierwszy." << endl;
-        cout << "Czy chcesz dodać nowe obsługiwane rodzaje kart?." << endl;
-        cout << "\n2.Wyświetl aktualnie obsługiwane rodzaje kart" << endl;
-        cout << "1.Tak" << endl;
-        cout << "0.Nie" << endl;
-        cout << "------------------------------------------------" << endl;
-        int menu_option;
-        cin >> menu_option;
-        switch (menu_option)
+        switch (displayMenu())
         {
         case 1:
 
@@ -63,7 +69,7 @@ void firstrun()
 }
 
 /**
- *  Sprawdza czy program był juz uruchomiony
+ *  Sprawdza czy program był juz uruchomiony na podstawie
  */
 bool wasused()
 {

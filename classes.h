@@ -28,7 +28,7 @@ public:
      */
     void generate_card_type(vector<string> &acceptedcards)
     {
-        card_type = acceptedcards[rand() % acceptedcards.size()];
+        card_type = acceptedcards[rand() % (acceptedcards.size() - 1)];
     }
 
     /**
@@ -79,14 +79,40 @@ public:
         double change;
         if (option == 1)
         {
-            cout << "Podaj kwotę do wpłacenia: ";
-            cin >> change;
+            for (;;)
+            {
+                cout << "Podaj kwotę do wpłacenia: ";
+                cin >> change;
+                if (change <= 0)
+                {
+                    cout << "/n-----------------------------" << endl;
+                    cout << "Podaj kwątę większą od zera!" << endl;
+                    cout << "-----------------------------" << endl;
+                }
+                else
+                {
+                    break;
+                }
+            }
             money += change;
         }
         else
         {
-            cout << "Podaj kwotę do wypłacenia: ";
-            cin >> change;
+            for (;;)
+            {
+                cout << "Podaj kwotę do wypłacenia: ";
+                cin >> change;
+                if (change <= 0)
+                {
+                    cout << "/n-----------------------------" << endl;
+                    cout << "Podaj kwątę większą od zera!" << endl;
+                    cout << "-----------------------------" << endl;
+                }
+                else
+                {
+                    break;
+                }
+            }
             if (money - change < 0)
             {
                 for (;;)
